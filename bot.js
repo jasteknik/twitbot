@@ -5,47 +5,65 @@ var T = new Twit( config )
 
 
 //console.log(woeid.getWoeid('FIN'))
-var params = {
-  id: '1 ' //1 is global, 23424812, finland
+const params = {
+  id: '813286', //1 is global, 23424812, finland
+  count: 1
+}
+const params2 = {
+  id: '23424812', //1 is global, 23424812, finland
+  //count: 1
 }
 
-topTrending()
+topTrending(params2)
+setInterval(() => topTrending(params2), 1000*60)
 
-setInterval(() => topTrending(), 1000*60)
+getTweets(params)
 
-function topTrending(){
-  T.get('trends/place', params, gotData);
+function getTweets(aPar) {
+  T.get('statuses/user_timeline', aPar, tweetData) //813286 barack obama
+
+  function tweetData(err, data, response){
+    console.log(data[0].text)
+    writeToFile("tweet",data)
+  }
+}
+
+function writeToFile(fileName ,toFile) {
+  const fs = require('fs')
+  const file = "./responses/" + fileName +  ".json"
+  const json = JSON.stringify(toFile, null, 2)
+    fs.writeFile(file, json,
+      (error) => {
+        if (error) console.log("Error on writing file: ", error)
+        else console.log("Writing file " + file)
+        })
+}
+
+function topTrending(aPar){
+  T.get('trends/place', aPar, gotData);
 
   function gotData(err, data, response) {
       //var tweets = data;
       //console.log(JSON.stringify(tweets, undefined, 2));
-      const responseFromApi = data[0].trends
-      const trends = []
+      //console.log("data: "+data)
+      try {
+        const responseFromApi = data[0].trends
+        const trends = []
 
-    //console.log(responseFromApi[0])
+      //console.log(responseFromApi[0])
 
-      Object.keys(responseFromApi).map((key, index) =>  {
-        trends.push(responseFromApi[key].name)
-      });
+        Object.keys(responseFromApi).map((key, index) =>  {
+          trends.push(responseFromApi[key].name)
+        });
 
-      //#1
-      console.log(trends[0])
+        //#1
+        //console.log(trends[0])
 
-      //write to file
-      const fs = require('fs')
-      var json = JSON.stringify(responseFromApi[0], null, 2)
-      
-      fs.appendFile("trends.json", json ,
-        (error) => {
-          if (error) console.log("error on append", error )
-          else console.log('Saved')
-        })
-      
-      json = JSON.stringify(data, null, 2)
-      fs.writeFile("response.json", json,
-        (error) => {
-          if (error) console.log("Error on writing file: ", error)
-          else console.log("Writing file response.json")
-          })
+        //write to file
+        writeToFile("trends", trends)
+      }
+      catch(err) {
+        console.log("ERROR on trending data collection: " + err)
+      }
   }
 }
