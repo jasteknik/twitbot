@@ -10,14 +10,25 @@ const params = {
   count: 1
 }
 const params2 = {
-  id: '23424812', //1 is global, 23424812, finland
+  id: '23424975', //1 is global, 23424812, finland, 23424975 UK
   //count: 1
 }
 
-topTrending(params2)
-setInterval(() => topTrending(params2), 1000*60)
+const keyword = 'oulu'
 
-getTweets(params)
+//topTrending(params2)
+//setInterval(() => topTrending(params2), 1000*60)
+
+//getTweets(params)
+
+//AvailableTrends()
+console.log("streaming keyword "  + keyword)
+var stream = T.stream('statuses/filter', { track: keyword })
+
+stream.on('tweet', function (tweet) {
+  //console.log(tweet)
+  writeToFile("streamKeyword", tweet)
+})
 
 function getTweets(aPar) {
   T.get('statuses/user_timeline', aPar, tweetData) //813286 barack obama
@@ -37,6 +48,15 @@ function writeToFile(fileName ,toFile) {
         if (error) console.log("Error on writing file: ", error)
         else console.log("Writing file " + file)
         })
+}
+
+function AvailableTrends() {
+  T.get('trends/available', null , gotTrendsAvailable)
+  function gotTrendsAvailable(err, data, response){
+    //console.log(data)
+    writeToFile("available", data)
+  }
+
 }
 
 function topTrending(aPar){
