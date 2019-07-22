@@ -1,8 +1,29 @@
-var Twit = require('twit')
+let Twit = require('twit')
 const woeid = require('woeid')
 const config = require('./config')
-var T = new Twit( config )
+const File = require('./file')
+const Datastore = require('nedb')
+let T = new Twit( config )
 
+let argKeyword = 'mango'
+let argLocation = 'noLoc'
+let argFollowers = 0
+let streamAppend = false
+
+const tweetObj = {
+  user: null,
+  tweet: null,
+  hashtags: [],
+  urls: []
+}
+
+const database = new Datastore('database.db'); //new neDB datastore
+database.loadDatabase();
+
+//Arguments from command line
+if (process.argv[2] != null) argKeyword = process.argv[2] //Keyword
+if (process.argv[3] != null) argLocation = process.argv[3] //Location
+if (process.argv[4] != null) argFollowers = process.argv[4] //Followers
 
 //console.log(woeid.getWoeid('FIN'))
 const params = {
@@ -14,47 +35,87 @@ const params2 = {
   //count: 1
 }
 
-const keyword = 'oulu'
-
 //topTrending(params2)
 //setInterval(() => topTrending(params2), 1000*60)
-
 //getTweets(params)
-
 //AvailableTrends()
-console.log("streaming keyword "  + keyword)
-var stream = T.stream('statuses/filter', { track: keyword })
 
-stream.on('tweet', function (tweet) {
-  //console.log(tweet)
-  writeToFile("streamKeyword", tweet)
+console.log(`streaming keyword ${argKeyword}, with location ${argLocation} and follower count ${argFollowers}` )
+//Start streaming keyword to file
+let stream = T.stream('statuses/filter', { track: argKeyword })
+stream.on('tweet', (tweet) => { 
+  
+  if (argLocation != '')
+
+
+  //console.log(txtToFile)
+  if (tweet.user.followers_count > argFollowers    
+    && ( argLocation === 'noLoc' 
+    ||  (argLocation != 'noLoc' 
+      && tweet.user.location != null
+      && tweet.user.location.toUpperCase() === argLocation.toUpperCase())))
+    {  //Only above follower limit and with or without location
+    const txtToFile = tweet.text + "\n" + "     FROM @" + tweet.user.name + "\n" + "\n"
+    tweetObj.user = tweet.user.name
+    tweetObj.tweet = tweet.text
+
+    if (tweet.entities.hashtags.length > 0) { //Push hashtags to object array
+      tweetObj.hashtags = []  //empty array
+      for (let i = 0; i < tweet.entities.hashtags.length; i++ ){
+        tweetObj.hashtags.push(tweet.entities.hashtags[i].text)
+      } 
+    }
+
+    if (tweet.entities.urls.length > 0) { //Push urls to object array
+      //console.log(tweet.entities.hashtags.length)
+      tweetObj.urls = []  //empty array
+      for (let i = 0; i < tweet.entities.urls.length; i++ ){
+        tweetObj.urls.push(tweet.entities.urls[i].url)
+        //console.log("pushing" + tweet.entities.hashtags[i].text)
+      }
+    }
+    //if (tweet.entities.urls.length > 0) tweetObj.urls = tweet.entities.urls[0].url
+
+    database.insert(tweetObj)
+
+    //console.log(tweetObj)
+
+    File.WriteToJson("streamKeyword", tweet) //write last to json file
+    //File.WriteToText("streamTweets_" + argKeyword, txtToFile, streamAppend)  //Append streamTweets.json file
+    //streamAppend = true //after first write, start appending file
+  }
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function getTweets(aPar) {
   T.get('statuses/user_timeline', aPar, tweetData) //813286 barack obama
 
   function tweetData(err, data, response){
     console.log(data[0].text)
-    writeToFile("tweet",data)
+    WriteJsonToFile("tweet", data)
   }
 }
 
-function writeToFile(fileName ,toFile) {
-  const fs = require('fs')
-  const file = "./responses/" + fileName +  ".json"
-  const json = JSON.stringify(toFile, null, 2)
-    fs.writeFile(file, json,
-      (error) => {
-        if (error) console.log("Error on writing file: ", error)
-        else console.log("Writing file " + file)
-        })
-}
 
 function AvailableTrends() {
   T.get('trends/available', null , gotTrendsAvailable)
   function gotTrendsAvailable(err, data, response){
     //console.log(data)
-    writeToFile("available", data)
+    WriteJsonToFile("available", data)
   }
 
 }
@@ -80,7 +141,7 @@ function topTrending(aPar){
         //console.log(trends[0])
 
         //write to file
-        writeToFile("trends", trends)
+        WriteJsonToFile("trends", trends)
       }
       catch(err) {
         console.log("ERROR on trending data collection: " + err)
