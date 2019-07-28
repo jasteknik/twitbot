@@ -9,12 +9,18 @@ let argKeyword = 'mango'
 let argLocation = 'noLoc'
 let argFollowers = 0
 let streamAppend = false
+let streamStopped = false
+let StreamCounter = 0
 
 const tweetObj = {
   user: null,
   tweet: null,
+  quote_count: 0,
+  reply_count: 0,
+  retweet_count: 0,
   hashtags: [],
-  urls: []
+  urls: [],
+  count: 0
 }
 
 const database = new Datastore('database.db'); //new neDB datastore
@@ -31,74 +37,85 @@ const params = {
   count: 1
 }
 const params2 = {
-  id: '23424975', //1 is global, 23424812, finland, 23424975 UK
+  id: '2357024', //1 is global, 23424812, finland, 23424975 UK, 2357024 US
   //count: 1
 }
 
-//topTrending(params2)
-//setInterval(() => topTrending(params2), 1000*60)
-//getTweets(params)
 //AvailableTrends()
 
-console.log(`streaming keyword ${argKeyword}, with location ${argLocation} and follower count ${argFollowers}` )
+topTrending(params2)
+
 //Start streaming keyword to file
-let stream = T.stream('statuses/filter', { track: argKeyword })
-stream.on('tweet', (tweet) => { 
+function TweetSreaming(){
+  let rowCount = 0
+  let stream = T.stream('statuses/filter', { track: argKeyword })
+  console.log(`streaming keyword ${argKeyword}, with location ${argLocation} and follower count ${argFollowers}` )
   
-  if (argLocation != '')
+  stream.on('tweet', (tweet) => { 
+    File.WriteToJson("streamKeyword", tweet) //write last to json file
+    if (argLocation != '')
+    //console.log(txtToFile)
+    if (tweet.user.followers_count > argFollowers    
+      && ( argLocation === 'noLoc' 
+      ||  (argLocation != 'noLoc' 
+        && tweet.user.location != null
+        && tweet.user.location.toUpperCase() === argLocation.toUpperCase())))
+      {  //Only above follower limit and with or without location
 
+        //File.WriteToJson("streamKeyword", tweet) //write last to json file
+        if(tweet.hasOwnProperty("retweeted_status")){ //Only if tweet is a retweet to someone elses tweet
+          WriteTweetObject(tweet)
+          //Insert new tweetObj to database
+          database.insert(tweetObj)
+          rowCount += 1
 
-  //console.log(txtToFile)
-  if (tweet.user.followers_count > argFollowers    
-    && ( argLocation === 'noLoc' 
-    ||  (argLocation != 'noLoc' 
-      && tweet.user.location != null
-      && tweet.user.location.toUpperCase() === argLocation.toUpperCase())))
-    {  //Only above follower limit and with or without location
-    const txtToFile = tweet.text + "\n" + "     FROM @" + tweet.user.name + "\n" + "\n"
-    tweetObj.user = tweet.user.name
-    tweetObj.tweet = tweet.text
+          console.log(rowCount)
 
-    if (tweet.entities.hashtags.length > 0) { //Push hashtags to object array
-      tweetObj.hashtags = []  //empty array
-      for (let i = 0; i < tweet.entities.hashtags.length; i++ ){
-        tweetObj.hashtags.push(tweet.entities.hashtags[i].text)
-      } 
-    }
-
-    if (tweet.entities.urls.length > 0) { //Push urls to object array
-      //console.log(tweet.entities.hashtags.length)
-      tweetObj.urls = []  //empty array
-      for (let i = 0; i < tweet.entities.urls.length; i++ ){
-        tweetObj.urls.push(tweet.entities.urls[i].url)
-        //console.log("pushing" + tweet.entities.hashtags[i].text)
+        
       }
     }
-    //if (tweet.entities.urls.length > 0) tweetObj.urls = tweet.entities.urls[0].url
 
-    database.insert(tweetObj)
+    if (rowCount > 100){ 
+      console.log("stop stream")
+      stream.stop()
+      streamStopped = true
+      topTrending(params2)
+    }
+  })
+}
 
-    //console.log(tweetObj)
+function WriteTweetObject(tweetJson) {
+  //Copy tweet information to object
 
-    File.WriteToJson("streamKeyword", tweet) //write last to json file
-    //File.WriteToText("streamTweets_" + argKeyword, txtToFile, streamAppend)  //Append streamTweets.json file
-    //streamAppend = true //after first write, start appending file
+  tweetObj.user = tweetJson.retweeted_status.user.name
+  tweetObj.tweet = tweetJson.retweeted_status.text
+  tweetObj.quote_count = tweetJson.retweeted_status.quote_count
+  tweetObj.reply_count = tweetJson.retweeted_status.reply_count
+  tweetObj.retweet_count = tweetJson.retweeted_status.retweet_count
+
+  //Are there more tweets from this user? Add counter by 1
+  database.count({
+    user: tweetObj.user }, (err, count) => {
+      if(err) console.log('error on fetching docs: ' + err)
+      //add tweet counter
+      tweetObj.count = count + 1 
+    }) 
+
+    /*
+  if (tweetJson.retweeted_status.extended_tweet.entities.hashtags.length > 0) { //Push hashtags to object array
+    tweetObj.hashtags = []  //empty array
+    for (let i = 0; i < tweetJson.retweeted_status.extended_tweet.entities.hashtags.length; i++ ){
+      tweetObj.hashtags.push(tweetJson.retweeted_status.extended_tweet.entities.hashtags[i].text)
+    } 
   }
-})
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+  if (tweetJson.retweeted_status.extended_tweet.entities.urls.length > 0) { //Push urls to object array
+    tweetObj.urls = []  //empty array
+    for (let i = 0; i < tweetJson.retweeted_status.extended_tweet.entities.urls.length; i++ ){
+      tweetObj.urls.push(tweetJson.retweeted_status.extended_tweet.entities.urls[i].url)
+    }
+  }*/
+}
 
 
 function getTweets(aPar) {
@@ -106,7 +123,7 @@ function getTweets(aPar) {
 
   function tweetData(err, data, response){
     console.log(data[0].text)
-    WriteJsonToFile("tweet", data)
+    File.WriteToJson("tweet", data)
   }
 }
 
@@ -115,7 +132,7 @@ function AvailableTrends() {
   T.get('trends/available', null , gotTrendsAvailable)
   function gotTrendsAvailable(err, data, response){
     //console.log(data)
-    WriteJsonToFile("available", data)
+    File.WriteToJson("available", data)
   }
 
 }
@@ -141,7 +158,12 @@ function topTrending(aPar){
         //console.log(trends[0])
 
         //write to file
-        WriteJsonToFile("trends", trends)
+        File.WriteToJson("trends", trends)
+        console.log(trends[0]) 
+        argKeyword = trends[StreamCounter]
+        argFollowers = 10
+        StreamCounter += 1
+        TweetSreaming()  //Start streaming trending keyword
       }
       catch(err) {
         console.log("ERROR on trending data collection: " + err)
