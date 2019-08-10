@@ -14,7 +14,7 @@ let streamStopped = false
 let StreamCounter = 0
 let stream
 
-const tweetObj = {
+const tweetObj = {  //Tweet object
   user: null,
   tweet: null,
   quote_count: 0,
@@ -25,27 +25,41 @@ const tweetObj = {
   count: 0
 }
 
-const database = new Datastore('database.db'); //new neDB datastore
-database.loadDatabase();
+function NewTrendsObject(aName, aPopularity) {
+  return {
+    'name': aName,
+    'popularity': aPopularity
+  }
+}
 
-function topTrending(aPar){
+//const database = new Datastore('database.db'); //new neDB datastore
+//database.loadDatabase();
+
+function topTrending(aPar){ //This should be promise!!! 
   T.get('trends/place', aPar, gotData);
 
   function gotData(err, data, response) {
       try {
+        
         const responseFromApi = data[0].trends
-        const trends = []
+        const trends = []        
+        let newTrendsObject
 
         Object.keys(responseFromApi).map((key, index) =>  {
-          trends.push(responseFromApi[key].name)
+          //New object needs to created. Because if trends object is changed and then pushed to array
+          //whole array will change to that new object. Because pushed object to array is just a reference!!!
+          newTrendsObject = NewTrendsObject(responseFromApi[key].name, 0)
+          trends.push(newTrendsObject)
         });
-        console.log("Starting to file write")
+
         //write to file
+        console.log("Starting to file write")
         File.WriteToJsonSync("trends", trends).then(() => {
           console.log("WriteToJsonSync, promise filled")
           argKeyword = trends[StreamCounter]
           argFollowers = 10
           StreamCounter += 1
+          return true //return true when done
         })
         
       }
@@ -57,7 +71,10 @@ function topTrending(aPar){
 
 //Start streaming keyword to file
 function TweetSreaming(keyword){
+  const database = new Datastore( './Databases/' + keyword + '.db'); //new neDB datastore
+  database.loadDatabase(); 
   rowCount = 0
+
   stream = T.stream('statuses/filter', { track: keyword }) 
   console.log(`streaming keyword ${keyword}, with location ${argLocation} and follower count ${argFollowers}` )
   
@@ -74,7 +91,7 @@ function TweetSreaming(keyword){
 
         //File.WriteToJson("streamKeyword", tweet) //write last to json file
         if(tweet.hasOwnProperty("retweeted_status")){ //Only if tweet is a retweet to someone elses tweet
-          WriteTweetObject(tweet)
+          WriteTweetObject(tweet, database)
           //Insert new tweetObj to database
           database.insert(tweetObj)
           rowCount += 1
@@ -85,7 +102,7 @@ function TweetSreaming(keyword){
   })
 }
 
-function WriteTweetObject(tweetJson) {
+function WriteTweetObject(tweetJson, dbRef) {
   //Copy tweet information to object
 
   tweetObj.user = tweetJson.retweeted_status.user.name
@@ -100,7 +117,7 @@ function WriteTweetObject(tweetJson) {
   }
 
   //Are there more tweets from this user? Add counter by 1
-  database.count({
+  dbRef.count({
     user: tweetObj.user }, (err, count) => {
       if(err) console.log('error on fetching docs: ' + err)
       //add tweet counter
