@@ -32,15 +32,11 @@ function NewTrendsObject(aName, aPopularity) {
   }
 }
 
-//const database = new Datastore('database.db'); //new neDB datastore
-//database.loadDatabase();
-
-function topTrending(aPar){ //This should be promise!!! 
-  T.get('trends/place', aPar, gotData);
-
-  function gotData(err, data, response) {
+function TopTrending(aPar) {
+  return new Promise((resolve, reject) => {
+    
+    const gotData = (err, data, response) => {
       try {
-        
         const responseFromApi = data[0].trends
         const trends = []        
         let newTrendsObject
@@ -54,19 +50,24 @@ function topTrending(aPar){ //This should be promise!!!
 
         //write to file
         console.log("Starting to file write")
-        File.WriteToJsonSync("trends", trends).then(() => {
-          console.log("WriteToJsonSync, promise filled")
-          argKeyword = trends[StreamCounter]
-          argFollowers = 10
-          StreamCounter += 1
-          return true //return true when done
-        })
-        
+        File.WriteToJsonSync("trends", trends)
+          .then(() => {
+            console.log("WriteToJsonSync, promise filled")
+            argKeyword = trends[StreamCounter]
+            argFollowers = 10
+            StreamCounter += 1
+            resolve()
+          })
+          //.catch(reject())
+          //Cant make this work... Need reject statement to handle errors
       }
       catch(err) {
         console.log("ERROR on trending data collection: " + err)
       }
-  }
+    }
+
+    T.get('trends/place', aPar, gotData);
+  })
 }
 
 //Start streaming keyword to file
@@ -81,24 +82,22 @@ function TweetSreaming(keyword){
   stream.on('tweet', (tweet) => { 
     File.WriteToJson("streamKeyword", tweet) //write last to json file
     if (argLocation != '')
-    //console.log(txtToFile)
-    if (tweet.user.followers_count > argFollowers    
-      && ( argLocation === 'noLoc' 
-      ||  (argLocation != 'noLoc' 
-        && tweet.user.location != null
-        && tweet.user.location.toUpperCase() === argLocation.toUpperCase())))
-      {  //Only above follower limit and with or without location
+      if (tweet.user.followers_count > argFollowers    
+        && ( argLocation === 'noLoc' 
+        ||  (argLocation != 'noLoc' 
+          && tweet.user.location != null
+          && tweet.user.location.toUpperCase() === argLocation.toUpperCase())))
+        {  //Only above follower limit and with or without location
 
-        //File.WriteToJson("streamKeyword", tweet) //write last to json file
-        if(tweet.hasOwnProperty("retweeted_status")){ //Only if tweet is a retweet to someone elses tweet
-          WriteTweetObject(tweet, database)
-          //Insert new tweetObj to database
-          database.insert(tweetObj)
-          rowCount += 1
-          //console.log(rowCount)
-          NewTweetTimeStamp = + new Date() //unix time   
+          //File.WriteToJson("streamKeyword", tweet) //write last to json file
+          if(tweet.hasOwnProperty("retweeted_status")){ //Only if tweet is a retweet to someone elses tweet
+            WriteTweetObject(tweet, database)
+            //Insert new tweetObj to database
+            database.insert(tweetObj)
+            rowCount += 1
+            NewTweetTimeStamp = + new Date() //unix time   
+        }
       }
-    }
   })
 }
 
@@ -148,7 +147,7 @@ function StopStreaming() {
 function GetRowCount() { return rowCount}
 
 module.exports = {
-  topTrending: topTrending,
+  TopTrending: TopTrending,
   TweetSreaming: TweetSreaming,
   StopStreaming: StopStreaming,
   GetRowCount: GetRowCount

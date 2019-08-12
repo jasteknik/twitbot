@@ -26,7 +26,7 @@ async function Routine() {
   console.log("Top trends fetched")
   
   keywordArray = await File.ReadFromFile('trends')
-  console.log("File read response: " + keywordArray[0].name)
+  console.log("File read response, total keywords found: " + keywordArray.length)
 
   StartStream() //Start stream, initial start at first keyword
   console.log("Routine(), after Stream start " )
@@ -36,24 +36,16 @@ async function Routine() {
 function FetchTopTrending() {
   return new Promise((resolve, reject) => {
     console.log("fetching trends...")
-    const response = bot.topTrending(params2)
-    resolve(response)
+    resolve(bot.TopTrending(params2))
   })
 }
-
-function Timeout() {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => resolve(), 2000)
-    
-  })
-}  
 
 function StartStream() {
 
   console.log("Streaming...")
   bot.TweetSreaming(keywordArray[currentTrend].name)
-  currentTrend += 1
-
+  //Ternary operation, comparator ? if true : if false
+  currentTrend = (currentTrend < keywordArray.length - 1) ? currentTrend += 1 : 0
 }
 
 function CheckTweetCount() {
@@ -75,9 +67,9 @@ function CheckTweetCount() {
   //Tweet count too low. Start streaming new keyword from trending list 
   else InterruptStreaming()
   //Tweets at 100, continue to next trending topic
-  if (count > 99 
+  if (count > 49 
       && keywordArray[currentTrend].popularity < 0.75
-      || count > 249)
+      || count > 150)
     InterruptStreaming()
   
 }
