@@ -10,6 +10,9 @@
   "author": "JSo",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "glob": "^7.1.4",
     "nedb": "^1.8.0",
     "twit": "^2.2.11",
     "woeid": "^1.0.5"
