@@ -16,19 +16,23 @@ let stream
 
 const tweetObj = {  //Tweet object
   user: null,
-  tweet: null,
-  quote_count: 0,
-  reply_count: 0,
+  userTweet: null,
+  followers_count: 0,
+  friends_count: 0,
+  reTweetedUser: null,
+  reTweetedScreen_name: null,
+  reTweet: null,
+  reTweet_quote_count: 0,
+  reTweet_reply_count: 0,
   retweet_count: 0,
-  hashtags: [],
-  urls: [],
-  count: 0
+  number: 0
 }
 
-function NewTrendsObject(aName, aPopularity) {
+function NewTrendsObject(aName, aPopularity, aTime) {
   return {
-    'name': aName,
-    'popularity': aPopularity
+    name: aName,
+    popularity: aPopularity,
+    timeStamp: aTime
   }
 }
 
@@ -44,7 +48,11 @@ function TopTrending(aPar) {
         Object.keys(responseFromApi).map((key, index) =>  {
           //New object needs to created. Because if trends object is changed and then pushed to array
           //whole array will change to that new object. Because pushed object to array is just a reference!!!
-          newTrendsObject = NewTrendsObject(responseFromApi[key].name, 0)
+          newTrendsObject = NewTrendsObject(
+            responseFromApi[key].name,
+            0,
+            new Date())
+            
           trends.push(newTrendsObject)
         });
 
@@ -105,22 +113,27 @@ function WriteTweetObject(tweetJson, dbRef) {
   //Copy tweet information to object
 
   tweetObj.user = tweetJson.retweeted_status.user.name
-  tweetObj.tweet = tweetJson.retweeted_status.text
+  tweetObj.userTweet = tweetJson.text
+  tweetObj.followers_count = tweetJson.user.followers_count
+  tweetObj.friends_count = tweetJson.friends_count
+  tweetObj.reTweetedUser = tweetJson.retweeted_status.user.name
+  tweetObj.reTweetedScreen_name = tweetJson.retweeted_status.user.screen_name
+  tweetObj.reTweet = tweetJson.retweeted_status.text
   tweetObj.quote_count = tweetJson.retweeted_status.quote_count
   tweetObj.reply_count = tweetJson.retweeted_status.reply_count
   tweetObj.retweet_count = tweetJson.retweeted_status.retweet_count
   
   if (tweetJson.hasOwnProperty("extended_tweet")){
     const fullText = tweetJson.extended_tweet  //check for full text (extented tweet)
-    if (fullText.hasOwnProperty("full_text")) tweetObj.tweet = fullText.full_text
+    if (fullText.hasOwnProperty("full_text")) tweetObj.reTweet = fullText.full_text
   }
 
   //Are there more tweets from this user? Add counter by 1
   dbRef.count({
-    user: tweetObj.user }, (err, count) => {
+    user: tweetObj.user }, (err, number) => {
       if(err) console.log('error on fetching docs: ' + err)
       //add tweet counter
-      tweetObj.count = count + 1 
+      tweetObj.number = number + 1 
     }) 
 
     /*
