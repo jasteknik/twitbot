@@ -13,6 +13,7 @@ let streamAppend = false
 let streamStopped = false
 let StreamCounter = 0
 let stream
+let currentKeyword = ''
 
 const tweetObj = {  //Tweet object
   user: null,
@@ -83,7 +84,7 @@ function TweetSreaming(keyword){
   const database = new Datastore( './Databases/' + keyword + '.db'); //new neDB datastore
   database.loadDatabase(); 
   rowCount = 0
-
+  currentKeyword = keyword
   stream = T.stream('statuses/filter', { track: keyword }) 
   console.log(`streaming keyword ${keyword}, with location ${argLocation} and follower count ${argFollowers}` )
   
@@ -159,9 +160,12 @@ function StopStreaming() {
 
 function GetRowCount() { return rowCount}
 
+function GetCurrentKeyword() {return currentKeyword}
+
 module.exports = {
   TopTrending: TopTrending,
   TweetSreaming: TweetSreaming,
   StopStreaming: StopStreaming,
-  GetRowCount: GetRowCount
+  GetRowCount: GetRowCount,
+  GetCurrentKeyword: GetCurrentKeyword
 }
