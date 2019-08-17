@@ -1,0 +1,65 @@
+body{
+  background-color: rgb(72, 85, 102)
+}
+
+#Button{
+  padding: 5px;
+
+}
+
+h3{
+  
+  text-align: left;
+  position: relative;
+  font-size: 25px;
+  top: -18px;
+  left: 15px;
+}
+
+.tweetTable{
+  margin: 20px;
+}
+
+/* CSS GRID elements */
+.twitHeader{
+  grid-area: header;
+
+  height: 40px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  background-color: rgb(90, 129, 212);;
+}
+
+.twitFollowers{
+  grid-area: followers;
+
+  height: 40px;
+  text-align: center;
+  font-size: 14px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  background-color:rgb(223, 216, 197);
+}
+
+.twitContent{
+  grid-area: conts;
+
+  margin: 5px;
+  padding: 10px;
+  
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  background-color: rgb(223, 216, 197);
+}
+
+
+
+/* CSS GRID Define */
+.tweetWrapper{
+  background-color: rgb(72, 85, 102);
+  display: grid;
+  margin-top: 10px;
+  grid-row-gap: 0px; 
+  grid-column-gap: 2px; 
+  grid-template-columns: auto auto 60px;
+  grid-template-areas: 
+      "header header followers"
+      "conts conts conts";
+}
