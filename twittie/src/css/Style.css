@@ -1,5 +1,9 @@
+:root{
+  --main-body-color:  rgb(151, 206, 174);
+  --main-wrapper-color: rgb(44, 75, 62); 
+}
 body{
-  background-color: rgb(72, 85, 102)
+  background-color: var(--main-body-color)
 }
 
 #Button{
@@ -24,42 +28,83 @@ h3{
 .twitHeader{
   grid-area: header;
 
+  background-color: var(--main-wrapper-color);
+  color: white;
   height: 40px;
+  border-radius: 10px;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  background-color: rgb(90, 129, 212);;
+  
+}
+
+.pageHeader{
+  grid-area: pageHeader;
+}
+
+.pageSidebar{
+  grid-area: pageSidebar;
+}
+
+.pageContent{
+  grid-area: pageContent;
+}
+
+.pageWrapper{
+  display: grid;
+  margin-top: 10px;
+  grid-row-gap: 0px;
+  grid-template-columns: 100px auto;
+  grid-template-areas: 
+      "pageHeader pageHeader"
+      "pageSidebar pageContent";
 }
 
 .twitFollowers{
   grid-area: followers;
-
+  background-color: var(--main-wrapper-color);
+  color: white;
   height: 40px;
   text-align: center;
-  font-size: 14px;
+  
+  font-size: 16px;
   font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  background-color:rgb(223, 216, 197);
+    
 }
 
 .twitContent{
   grid-area: conts;
 
+  background-color: var(--main-body-color);
+  border-radius: 5px;
+  margin: 5px;
+  padding: 10px;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+}
+
+.reTwitContent{
+  grid-area: reconts;
+
+  background-color: var(--main-body-color);
+  border-radius: 5px;
   margin: 5px;
   padding: 10px;
   
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  background-color: rgb(223, 216, 197);
+  
 }
-
-
 
 /* CSS GRID Define */
 .tweetWrapper{
-  background-color: rgb(72, 85, 102);
+  background-color: var(--main-wrapper-color);
   display: grid;
   margin-top: 10px;
+  padding: 5px;
+  border-radius: 10px;
   grid-row-gap: 0px; 
   grid-column-gap: 2px; 
   grid-template-columns: auto auto 60px;
   grid-template-areas: 
       "header header followers"
-      "conts conts conts";
+      "conts conts conts"
+      "reconts reconts reconts";
 }

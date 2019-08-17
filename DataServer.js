@@ -173,7 +173,7 @@ function CheckLimits(aKeyword, aCount) {
 
 function InitDataNotDone() {
   return new Promise((resolve, reject) => {
-    if(currentTrend < 1){      //keywordArray.length
+    if(currentTrend < 5){      //keywordArray.length
       resolve(true)
     }
     else {

@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const Datastore = require('nedb')
 const glob = require('glob')
+const File = require('./file')
 
 let db
 let dbName
@@ -22,8 +23,15 @@ app.get('/api', (req, res) => {
   FindAllTweets().then(data => {
     res.json(data)
     console.log("Request from user")
-  })
-  
+  }) 
+})
+
+//Client get requests, /api
+app.get('/getDatabases', (req, res) => {
+  FindAllDatabases().then(data => {
+    res.json(data)
+    console.log("Request from user, databases")
+  }) 
 })
 
 const PORT = 3001
@@ -55,19 +63,24 @@ function FindTopTweet(filteredUser) {
 function FindAllTweets() {
   return new Promise((resolve, reject) => {
     db.find({}) //$not: { user: filteredUser }
-    .sort({ number: -1 })
-    .exec((err, docs) => {
-      // docs is [doc1, doc3, doc2]
-      query = docs
-      //console.log("Query dot username: " + query.user)
-      if (err) reject('Error on sorting datatable')
+      .exec((err, docs) => {
+        // docs is [doc1, doc3, doc2]
+        query = docs
+        //console.log("Query dot username: " + query.user)
+        if (err) reject('Error on sorting datatable')
 
-      resolve(query)
-
+        resolve(query)
     })
   }) //Return new promise
 }
 
+function FindAllDatabases() {
+  return new Promise((resolve, reject) => {
+    File.ListFolder('./Databases/').then(response => {
+      //console.log("Files in folder " + response)
+      resolve(response)})
+  })
+}
 
 //Server start routine. Handles loading database. 
 //

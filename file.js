@@ -55,10 +55,17 @@ function ReadFromFile(fileName) {
   })
 }
 
+function ListFolder(path) {
+  return new Promise((resolve, reject) => {
+    fs.readdir(path, (err, files) => resolve(files))
+  })
+}
+
 module.exports = {
   WriteToJson: WriteToJson,
   WriteToJsonSync: WriteToJsonSync,
   WriteToText: WriteToText,
-  ReadFromFile: ReadFromFile
+  ReadFromFile: ReadFromFile,
+  ListFolder: ListFolder
   
 }
