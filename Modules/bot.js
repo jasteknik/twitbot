@@ -1,8 +1,10 @@
 let Twit = require('twit')
 const woeid = require('woeid')
-const config = require('./config')
+const config = require('./../config')
 const File = require('./file')
 const Datastore = require('nedb')
+const AddUrl = require('./urlify')
+
 let T = new Twit( config )
 let rowCount = 0
 
@@ -114,7 +116,7 @@ function WriteTweetObject(tweetJson, dbRef) {
   //Copy tweet information to object
 
   tweetObj.user = tweetJson.retweeted_status.user.name
-  tweetObj.userTweet = tweetJson.text
+  tweetObj.userTweet = AddUrl.urlify(tweetJson.text)  //Check user tweet for URL, make a html link
   tweetObj.followers_count = tweetJson.user.followers_count
   tweetObj.friends_count = tweetJson.friends_count
   tweetObj.reTweetedUser = tweetJson.retweeted_status.user.name

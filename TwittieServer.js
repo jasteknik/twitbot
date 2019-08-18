@@ -2,8 +2,7 @@ const cors = require ('cors')
 const express = require('express')
 const app = express()
 const Datastore = require('nedb')
-const glob = require('glob')
-const File = require('./file')
+const File = require('./Modules/file')
 
 let db
 let dbName
@@ -28,10 +27,16 @@ app.get('/api', (req, res) => {
 
 //Client get requests, /api
 app.get('/getDatabases', (req, res) => {
-  FindAllDatabases().then(data => {
+  FindAllDatabases('./TwittieDB/').then(data => {
     res.json(data)
     console.log("Request from user, databases")
   }) 
+})
+
+//Client requests new database
+app.post('/loadDatabase', (req, res) => {
+  console.log(req)
+  res.json({ok: 'ok'})
 })
 
 const PORT = 3001
@@ -64,49 +69,74 @@ function FindAllTweets() {
   return new Promise((resolve, reject) => {
     db.find({}) //$not: { user: filteredUser }
       .exec((err, docs) => {
-        // docs is [doc1, doc3, doc2]
         query = docs
-        //console.log("Query dot username: " + query.user)
         if (err) reject('Error on sorting datatable')
-
         resolve(query)
     })
   }) //Return new promise
 }
 
-function FindAllDatabases() {
+//Server start routine. Handles loading database. 
+//
+async function ServerStartRoutine() {
+
+  console.log('copying DB files from Dataserver...')
+  
+  const dataserverList = await FindAllDatabases('./Databases/')
+  const copy = await CopyAll(dataserverList)
+  
+  const wait1 = await WaitUntil(1000, "Copying of server files done")
+  console.log(wait1)
+
+  console.log('Finding DB files on ./TwittieDB/')
+  const dbList = await FindAllDatabases('./TwittieDB/')
+
+  const wait2 = await WaitUntil(1000, "Gathered DB files")
+  console.log(wait2)
+
+  console.log(`Loading database ${dbList[0]} `)
+  const loadResult = await LoadDatabase(dbList[0])
+
+  const wait3 = await WaitUntil(1000, `DB ${loadResult} loaded. Ready for data requests`)
+  console.log(wait3)
+  
+}
+
+function FindAllDatabases(path) {
   return new Promise((resolve, reject) => {
-    File.ListFolder('./Databases/').then(response => {
+    File.ListFolder(path).then(response => {
       //console.log("Files in folder " + response)
       resolve(response)})
   })
 }
 
-//Server start routine. Handles loading database. 
-//
-async function ServerStartRoutine() {
-  console.log('Loading DB')
-  const loadResult = await LoadDatabase()
-  console.log(`DB ${loadResult} loaded. Ready for data requests`)
-}
-
 //LoadDatabase function
 //Returns promise. Posts database name when ready
-function LoadDatabase() {
+function LoadDatabase(file) {
   return new Promise((resolve, reject) => {
-    glob("./TwittieDB/*.db", {}, function (er, files) {
-      // files is an array of filenames.
-      // If the `nonull` option is set, and nothing
-      // was found, then files is ["**/*.js"]
-      // er is an error object or null.
-      dbName = files[0]
-      db = new Datastore({ filename: './' + dbName })
-      db.loadDatabase((err) => {    // Callback is optional
-        if (err) reject("error at loading database, errorcode: " + err)
-        else resolve(dbName)
-      })
-      if (er) reject('Cant find DB files on directory: ' + er)
+    db = new Datastore({ filename: './' + file })
+    db.loadDatabase((err) => {    // Callback is optional
+      if (err) reject("error at loading database, errorcode: " + err)
+      else resolve(file)
     })
+  })
+} 
+
+function CopyAll(source) {
+  return new Promise((resolve, reject) => {
+    source.forEach(file => {
+      File.CopyFile( './Databases/' + file, './TwittieDB/' + file)
+        .then(resp => {
+          console.log(resp)
+          resolve('OK')
+        })
+    }) 
+  }) 
+}
+
+function WaitUntil(time, routine) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(routine), time)
   })
 }
 

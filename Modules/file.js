@@ -61,11 +61,22 @@ function ListFolder(path) {
   })
 }
 
+function CopyFile(src, dest) {
+  return new Promise((resolve, reject) => {
+    // destination.txt will be created or overwritten by default.
+    fs.copyFile(src, dest, (err) => {
+      if (err) reject(err);
+      else resolve(`${src} was copied to ${dest}`)
+    })
+  })
+}
+
 module.exports = {
   WriteToJson: WriteToJson,
   WriteToJsonSync: WriteToJsonSync,
   WriteToText: WriteToText,
   ReadFromFile: ReadFromFile,
-  ListFolder: ListFolder
+  ListFolder: ListFolder,
+  CopyFile: CopyFile
   
 }

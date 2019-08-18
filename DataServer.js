@@ -1,8 +1,8 @@
 //Imports
-const bot = require('./botmodule')
-const File = require('./file')
+const bot = require('./Modules/bot')
+const File = require('./Modules/file')
 const Datastore = require('nedb')
-const colors = require('colors')
+const colors = require('colors')  //console.log color NPM
 
 let keywordArray = undefined
 let currentKeyword = undefined
@@ -21,7 +21,7 @@ database.loadDatabase();
 
 //Stream parameters
 const params2 = {
-  id: '23424975', //1 is global, 23424812, finland, 23424975 UK, 2357024 US
+  id: '2357024', //1 is global, 23424812, finland, 23424975 UK, 2357024 US
   //count: 1
 }
 

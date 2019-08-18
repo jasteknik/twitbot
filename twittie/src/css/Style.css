@@ -6,9 +6,9 @@ body{
   background-color: var(--main-body-color)
 }
 
-#Button{
+Button{
   padding: 5px;
-
+  width: 195px;
 }
 
 h3{
@@ -21,90 +21,10 @@ h3{
 }
 
 .tweetTable{
-  margin: 20px;
+  margin-left: 40px;
 }
 
-/* CSS GRID elements */
-.twitHeader{
-  grid-area: header;
-
-  background-color: var(--main-wrapper-color);
-  color: white;
-  height: 40px;
-  border-radius: 10px;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  
-}
-
-.pageHeader{
-  grid-area: pageHeader;
-}
-
-.pageSidebar{
-  grid-area: pageSidebar;
-}
-
-.pageContent{
-  grid-area: pageContent;
-}
-
-.pageWrapper{
-  display: grid;
-  margin-top: 10px;
-  grid-row-gap: 0px;
-  grid-template-columns: 100px auto;
-  grid-template-areas: 
-      "pageHeader pageHeader"
-      "pageSidebar pageContent";
-}
-
-.twitFollowers{
-  grid-area: followers;
-  background-color: var(--main-wrapper-color);
-  color: white;
-  height: 40px;
-  text-align: center;
-  
-  font-size: 16px;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    
-}
-
-.twitContent{
-  grid-area: conts;
-
-  background-color: var(--main-body-color);
-  border-radius: 5px;
-  margin: 5px;
-  padding: 10px;
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-
-}
-
-.reTwitContent{
-  grid-area: reconts;
-
-  background-color: var(--main-body-color);
-  border-radius: 5px;
-  margin: 5px;
-  padding: 10px;
-  
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  
-}
-
-/* CSS GRID Define */
-.tweetWrapper{
-  background-color: var(--main-wrapper-color);
-  display: grid;
-  margin-top: 10px;
-  padding: 5px;
-  border-radius: 10px;
-  grid-row-gap: 0px; 
-  grid-column-gap: 2px; 
-  grid-template-columns: auto auto 60px;
-  grid-template-areas: 
-      "header header followers"
-      "conts conts conts"
-      "reconts reconts reconts";
+.center{
+  position: relative;
+  left: 12%;
 }
