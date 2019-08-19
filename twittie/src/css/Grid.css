@@ -4,6 +4,8 @@
   --main-border-color:   rgb(88, 124, 111); 
 }
 
+
+
 /* CSS GRID elements
    PAGE GRID          */
 .pageHeader{
@@ -95,15 +97,15 @@
 
 }
 
-.reTwitContent{
-  grid-area: reconts;
+.twitInfo{
+  grid-area: info;
 
   background-color: var(--main-body-color);
   border-radius: 5px;
   margin: 5px;
   padding: 10px;
   
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   
 }
 
@@ -120,5 +122,6 @@
   grid-template-areas: 
       "profilepic header followers"
       "conts conts conts"
-      "reconts reconts reconts";
+      "info info info";
 }
+

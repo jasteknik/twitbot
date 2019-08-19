@@ -6,8 +6,8 @@ import DisplayDatabases from './Modules/DisplayDatabases'
 import apiService from './Services/ApiService'
 
 //CSS
-import './css/Style.css'
 import './css/Grid.css'
+import './css/Style.css'
 
 const App = () => {
   const [tweet, newTweet] = useState([])

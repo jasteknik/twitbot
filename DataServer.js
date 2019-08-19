@@ -21,7 +21,7 @@ database.loadDatabase();
 
 //Stream parameters
 const params2 = {
-  id: '23424975', //1 is global, 23424812, finland, 23424975 UK, 2357024 US
+  id: '2357024', //1 is global, 23424812, finland, 23424975 UK, 2357024 US
   //count: 1
 }
 

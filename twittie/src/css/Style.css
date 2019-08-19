@@ -29,8 +29,12 @@ h3{
   left: 12%;
 }
 
-img{
+.twitProfilePic img{
   border-color: var(--main-wrapper-color);
-  border-radius: 15px;
+  border-radius: 25px;
   border-style: solid;
+}
+
+a{
+  color: aliceblue;
 }

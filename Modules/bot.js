@@ -29,7 +29,14 @@ const tweetObj = {  //Tweet object
   reTweet_reply_count: 0,
   retweet_count: 0,
   profile_image_url: '',
+  hashtags: [],
+  urls: [],
   number: 0
+}
+
+//Function for tweet object creation. Maybe convert this to class object??
+function NewTweetObj(obj) {
+  return tweetObj = obj
 }
 
 function NewTrendsObject(aName, aPopularity, aTime) {
@@ -115,8 +122,9 @@ function TweetSreaming(keyword){
 
 function WriteTweetObject(tweetJson, dbRef) {
   //Copy tweet information to object
+  //const twitObj = NewTweetObj(tweetObj) 
 
-  tweetObj.user = tweetJson.retweeted_status.user.name
+  tweetObj.user = tweetJson.user.name
   tweetObj.userTweet = tweetJson.text //AddUrl.urlify(tweetJson.text)  //Check user tweet for URL, make a html link
   tweetObj.followers_count = tweetJson.user.followers_count
   tweetObj.friends_count = tweetJson.friends_count
@@ -127,35 +135,46 @@ function WriteTweetObject(tweetJson, dbRef) {
   tweetObj.reply_count = tweetJson.retweeted_status.reply_count
   tweetObj.retweet_count = tweetJson.retweeted_status.retweet_count
   tweetObj.profile_image_url = tweetJson.user.profile_image_url
-  
+  //get urls of text
+  const tweetUrls = GetUrl(tweetJson.text)
+
   if (tweetJson.hasOwnProperty("extended_tweet")){
     const fullText = tweetJson.extended_tweet  //check for full text (extented tweet)
-    if (fullText.hasOwnProperty("full_text")) tweetObj.reTweet = fullText.full_text
+    if (fullText.hasOwnProperty("full_text")) tweetObj.userTweet = fullText.full_text
   }
 
   //Are there more tweets from this user? Add counter by 1
   dbRef.count({
-    user: tweetObj.user }, (err, number) => {
+    reTweetedUser: tweetObj.reTweetedUser }, (err, number) => {
       if(err) console.log('error on fetching docs: ' + err)
       //add tweet counter
       tweetObj.number = number + 1 
     }) 
 
-    /*
-  if (tweetJson.retweeted_status.extended_tweet.entities.hashtags.length > 0) { //Push hashtags to object array
-    tweetObj.hashtags = []  //empty array
-    for (let i = 0; i < tweetJson.retweeted_status.extended_tweet.entities.hashtags.length; i++ ){
-      tweetObj.hashtags.push(tweetJson.retweeted_status.extended_tweet.entities.hashtags[i].text)
-    } 
-  }
+  tweetObj.hashtags = []  //clear array.. Maybe make a new class object??
+  tweetObj.urls = []
 
-  if (tweetJson.retweeted_status.extended_tweet.entities.urls.length > 0) { //Push urls to object array
-    tweetObj.urls = []  //empty array
-    for (let i = 0; i < tweetJson.retweeted_status.extended_tweet.entities.urls.length; i++ ){
-      tweetObj.urls.push(tweetJson.retweeted_status.extended_tweet.entities.urls[i].url)
-    }
-  }*/
+  if (tweetJson.entities.hashtags.length > 0) { //Push hashtags to object array
+    tweetJson.entities.hashtags.forEach(tag => {
+      //console.log("new hashtag added: " + tag.text)
+      tweetObj.hashtags.push(tag.text)})
+  }
+  if (tweetUrls != null && tweetUrls.length > 0) { //Push hashtags to object array
+    tweetUrls.forEach(url => {
+      console.log("new url added: " + url)
+      tweetObj.urls.push(url)})
+  }
+  if (tweetJson.entities.urls.length > 0) { //Push urls to object array
+    tweetJson.entities.urls.forEach(url => {
+      //console.log("new url added: " + url.expanded_url)
+      tweetObj.urls.push(url.expanded_url)})
+  }
 }
+
+function GetUrl(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.match(urlRegex)
+} 
 
 function StopStreaming() {
   console.log("stream stop called")
