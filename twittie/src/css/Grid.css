@@ -4,18 +4,8 @@
   --main-border-color:   rgb(88, 124, 111); 
 }
 
-/* CSS GRID elements */
-.twitHeader{
-  grid-area: header;
-
-  background-color: var(--main-wrapper-color);
-  color: white;
-  height: 40px;
-  border-radius: 10px;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-  
-}
-
+/* CSS GRID elements
+   PAGE GRID          */
 .pageHeader{
   grid-area: pageHeader;
 }
@@ -58,6 +48,28 @@
       "pageHeader pageHeader"
       "pageSpacer pageSpacer"
       "pageSidebar pageContent";
+}
+
+/* CSS GRID elements
+   TWEET GRID          */
+
+.twitHeader{
+  grid-area: header;
+
+  background-color: var(--main-wrapper-color);
+  color: white;
+  height: 40px;
+  margin-left: 20px;
+  border-radius: 10px;
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  
+}
+
+.twitProfilePic{
+  grid-area: profilepic;
+
+  height: 50px;
+  margin: 5px;
 }
 
 .twitFollowers{
@@ -104,9 +116,9 @@
   border-radius: 10px;
   grid-row-gap: 0px; 
   grid-column-gap: 2px; 
-  grid-template-columns: auto auto 60px;
+  grid-template-columns: 40px auto 60px;
   grid-template-areas: 
-      "header header followers"
+      "profilepic header followers"
       "conts conts conts"
       "reconts reconts reconts";
 }

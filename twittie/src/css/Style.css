@@ -28,3 +28,9 @@ h3{
   position: relative;
   left: 12%;
 }
+
+img{
+  border-color: var(--main-wrapper-color);
+  border-radius: 15px;
+  border-style: solid;
+}

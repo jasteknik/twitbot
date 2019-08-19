@@ -28,6 +28,7 @@ const tweetObj = {  //Tweet object
   reTweet_quote_count: 0,
   reTweet_reply_count: 0,
   retweet_count: 0,
+  profile_image_url: '',
   number: 0
 }
 
@@ -116,7 +117,7 @@ function WriteTweetObject(tweetJson, dbRef) {
   //Copy tweet information to object
 
   tweetObj.user = tweetJson.retweeted_status.user.name
-  tweetObj.userTweet = AddUrl.urlify(tweetJson.text)  //Check user tweet for URL, make a html link
+  tweetObj.userTweet = tweetJson.text //AddUrl.urlify(tweetJson.text)  //Check user tweet for URL, make a html link
   tweetObj.followers_count = tweetJson.user.followers_count
   tweetObj.friends_count = tweetJson.friends_count
   tweetObj.reTweetedUser = tweetJson.retweeted_status.user.name
@@ -125,6 +126,7 @@ function WriteTweetObject(tweetJson, dbRef) {
   tweetObj.quote_count = tweetJson.retweeted_status.quote_count
   tweetObj.reply_count = tweetJson.retweeted_status.reply_count
   tweetObj.retweet_count = tweetJson.retweeted_status.retweet_count
+  tweetObj.profile_image_url = tweetJson.user.profile_image_url
   
   if (tweetJson.hasOwnProperty("extended_tweet")){
     const fullText = tweetJson.extended_tweet  //check for full text (extented tweet)

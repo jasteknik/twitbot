@@ -7,8 +7,8 @@ const GetData = (url) => {
   return request.then(response => response.data)
 }
 
-const ChangeData = (url, data, config) => {
-  const request = Axios.post(baseUrl + url, data, config)
+const ChangeData = (url, data) => {
+  const request = Axios.post(baseUrl + url, data)
   return request.then(response => response.data)
 }
 

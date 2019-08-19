@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
 import DisplayTweets from './Modules/DisplayTweets'
 import DisplayDatabases from './Modules/DisplayDatabases'
-import Button from './Modules/Button'
 
 //Services
-import ApiService from './Services/ApiService'
+import apiService from './Services/ApiService'
 
 //CSS
 import './css/Style.css'
@@ -15,9 +14,9 @@ const App = () => {
   const [databases, newDatabases] = useState(['no files'])
 
   const updateData = () => {
-    const tweetResponse = ApiService.GetData('/api')
+    const tweetResponse = apiService.GetData('/api')
     tweetResponse.then(response => newTweet(response))
-    const dbResponse = ApiService.GetData('/getDatabases')
+    const dbResponse = apiService.GetData('/getDatabases')
     dbResponse.then(response => newDatabases(response))
   }
 
@@ -29,7 +28,6 @@ const App = () => {
         <button onClick={updateData}>Update Tweet table</button>
         <h2>Choose your DB</h2>
         <DisplayDatabases data={databases} />
-        <Button onClick={() => console.log('kek')} text={'test BUTTON'} ></Button>
       </div>
       <div className='pageContent'>
         <div className='tweetTable'>

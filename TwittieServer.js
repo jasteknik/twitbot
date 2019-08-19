@@ -3,6 +3,7 @@ const express = require('express')
 const app = express()
 const Datastore = require('nedb')
 const File = require('./Modules/file')
+const bodyParser = require('body-parser')
 
 let db
 let dbName
@@ -12,6 +13,11 @@ let query = {};
 //Cors, Server needs to have cors rights to be able to serv
 //http and get request from two different sources. Web safety system
 app.use(cors())
+app.use(express.json({ limit: '1mb' }))
+//Body parser to parse incoming POST() from client
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
 //Simple server page
 app.get('/', (req, res) => {
   res.send('<h1>Twittie server</h1>')
@@ -35,8 +41,14 @@ app.get('/getDatabases', (req, res) => {
 
 //Client requests new database
 app.post('/loadDatabase', (req, res) => {
-  console.log(req)
-  res.json({ok: 'ok'})
+  console.log("Client requests " + req.body.filename)
+  LoadDatabase(req.body.filename).then(dbReady => {
+    res.json({
+      received: 'success',
+      filename: dbReady
+    })
+  })
+  
 })
 
 const PORT = 3001
@@ -114,7 +126,7 @@ function FindAllDatabases(path) {
 //Returns promise. Posts database name when ready
 function LoadDatabase(file) {
   return new Promise((resolve, reject) => {
-    db = new Datastore({ filename: './' + file })
+    db = new Datastore({ filename: './TwittieDB/' + file })
     db.loadDatabase((err) => {    // Callback is optional
       if (err) reject("error at loading database, errorcode: " + err)
       else resolve(file)
