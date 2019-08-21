@@ -1,14 +1,29 @@
 :root{
-  --main-body-color:  rgb(151, 206, 174);
-  --main-wrapper-color: rgb(44, 75, 62); 
+  --main-background-color: rgb(195, 225, 236);
+  --main-sidebar-color:  rgb(1, 8, 29);
+  --main-wrapper-color: rgb(1, 8, 29);
+  --main-content-color:  aliceblue;
+  --main-border-color:   rgb(1, 8, 29);
+
+  --main-font-color: rgb(248, 236, 250);
+  --main-darkfont-color: rgb(1, 8, 29);
+  --main-header-color: aliceblue;
+
 }
 body{
-  background-color: var(--main-body-color)
+  background-color: var(--main-background-color)
 }
 
 Button{
   padding: 5px;
   width: 195px;
+}
+
+h1{
+  color: aliceblue;
+  font-size: 46px;
+  font-family: 'Righteous', cursive;
+  text-align: center;
 }
 
 h3{
@@ -36,5 +51,5 @@ h3{
 }
 
 a{
-  color: aliceblue;
+  color: var(--main-darkfont-color);
 }

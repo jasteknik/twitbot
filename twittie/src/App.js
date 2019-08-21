@@ -22,7 +22,7 @@ const App = () => {
 
   return (
     <div className='pageWrapper center'>
-      <div className='pageHeader'><h1>Twittie</h1></div>
+      <div className='pageHeader'><h1>TWITTIE !</h1></div>
       <div className='pageSpacer'></div>
       <div className='pageSidebar'>
         <button onClick={updateData}>Update Tweet table</button>
