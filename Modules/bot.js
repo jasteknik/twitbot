@@ -39,10 +39,19 @@ function NewTweetObj(obj) {
   return tweetObj = obj
 }
 
-function NewTrendsObject(aName, aPopularity, aTime) {
+function NewStatsObject() {
+  return {
+    tpm: aTpm, //tweets per minute
+    popularity: aPop,
+    
+  }
+}
+
+function NewTrendsObject(aName, aPopularity, aStats, aTime) {
   return {
     name: aName,
     popularity: aPopularity,
+    statistics: aStats,
     timeStamp: aTime
   }
 }
